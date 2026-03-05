@@ -8,24 +8,23 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - Linux
+      - ARM64
+      - carboard
 
     steps:
-      - name: Deploy over SSH
-        uses: appleboy/ssh-action@v1.2.2
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script_stop: true
-          script: |
-            set -e
-            mkdir -p "${{ secrets.DEPLOY_PATH }}"
-            cd "${{ secrets.DEPLOY_PATH }}"
-            if [ ! -d .git ]; then
-              git clone "https://github.com/${{ github.repository }}.git" .
-            fi
-            git fetch origin "${{ github.ref_name }}"
-            git checkout "${{ github.ref_name }}"
-            git pull --ff-only origin "${{ github.ref_name }}"
+      - name: Deploy locally
+        env:
+          DEPLOY_PATH: /home/carboard/carboard
+        run: |
+          set -e
+          mkdir -p "$DEPLOY_PATH"
+          cd "$DEPLOY_PATH"
+          if [ ! -d .git ]; then
+            git clone "https://github.com/${GITHUB_REPOSITORY}.git" .
+          fi
+          git fetch origin "${GITHUB_REF_NAME}"
+          git checkout "${GITHUB_REF_NAME}"
+          git pull --ff-only origin "${GITHUB_REF_NAME}"
