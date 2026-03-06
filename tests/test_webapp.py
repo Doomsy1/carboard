@@ -18,8 +18,17 @@ class FakeGPIOController:
         return dict(self.pwm_states)
 
     def write(self, bcm_pin, value):
+        self.pwm_states.pop(bcm_pin, None)
         self.states[bcm_pin] = bool(value)
         return self.states[bcm_pin]
+
+    def write_pwm(self, bcm_pin, frequency, duty_cycle):
+        self.states.pop(bcm_pin, None)
+        self.pwm_states[bcm_pin] = {
+            "frequency": frequency,
+            "duty_cycle": duty_cycle,
+        }
+        return self.pwm_states[bcm_pin]
 
 
 class FakeCameraStreamer:
@@ -169,6 +178,71 @@ class WebAppTests(unittest.TestCase):
 
         stream_response = self.client.get("/stream.mjpg")
         self.assertEqual(stream_response.status_code, 503)
+
+    def test_pwm_endpoint_sets_duty_cycle_and_frequency(self):
+        response = self.client.post(
+            "/api/pins/18/pwm",
+            json={"frequency": 1000, "duty_cycle": 50},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+        self.assertEqual(payload["pwm"]["frequency"], 1000)
+        self.assertEqual(payload["pwm"]["duty_cycle"], 50)
+        self.assertIn(18, self.controller.pwm_states)
+
+    def test_pwm_endpoint_rejects_non_pwm_pin(self):
+        response = self.client.post(
+            "/api/pins/17/pwm",
+            json={"frequency": 1000, "duty_cycle": 50},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        payload = response.get_json()
+        self.assertIn("PWM", payload["error"])
+
+    def test_pwm_endpoint_validates_duty_cycle_range(self):
+        response = self.client.post(
+            "/api/pins/18/pwm",
+            json={"frequency": 1000, "duty_cycle": 150},
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_pwm_endpoint_validates_frequency(self):
+        response = self.client.post(
+            "/api/pins/18/pwm",
+            json={"frequency": 0, "duty_cycle": 50},
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_pwm_endpoint_requires_both_fields(self):
+        response = self.client.post(
+            "/api/pins/18/pwm",
+            json={"frequency": 1000},
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_pin_api_includes_pwm_capable_flag(self):
+        response = self.client.get("/api/pins")
+
+        payload = response.get_json()
+        pin_18 = next(p for p in payload["pins"] if p["bcm_pin"] == 18)
+        self.assertTrue(pin_18["pwm_capable"])
+        pin_17 = next(p for p in payload["pins"] if p["bcm_pin"] == 17)
+        self.assertFalse(pin_17["pwm_capable"])
+
+    def test_pin_api_includes_active_pwm_state(self):
+        self.controller.write_pwm(18, 500, 75)
+
+        response = self.client.get("/api/pins")
+
+        payload = response.get_json()
+        pin_18 = next(p for p in payload["pins"] if p["bcm_pin"] == 18)
+        self.assertEqual(pin_18["pwm"]["frequency"], 500)
+        self.assertEqual(pin_18["pwm"]["duty_cycle"], 75)
 
     def test_restart_endpoint_calls_system_restart(self):
         response = self.client.post("/api/system/restart")

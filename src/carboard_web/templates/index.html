@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{{ page_title | default("CARBOARD GPIO Control Console") }}</title>
+    <title>{{ page_title | default("CARBOARD GPIO Console") }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -18,41 +18,45 @@
   <body>
     <div class="page-shell">
       <div class="noise"></div>
-      <header class="hero">
-        <div class="hero-copy">
-          <p class="eyebrow">Field Operations / Raspberry Pi</p>
-          <h1>GPIO Control Console</h1>
-          <p class="hero-text">
-            Live control for the
-            <span>{{ model_name | default("Raspberry Pi 4 Model B") }}</span>
-            with camera monitoring and one-touch system recovery.
-          </p>
+
+      <header class="topbar">
+        <div class="topbar-brand">
+          <strong>Carboard</strong>
+          <span>GPIO Console</span>
         </div>
-        <div class="hero-stats">
-          <div class="stat-card">
-            <span class="stat-label">GPIO Header</span>
-            <strong>{{ header_pin_count | default(40) }} Pins</strong>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Camera</span>
-            <strong id="camera-status-label">Checking</strong>
-          </div>
-          <div class="stat-card caution">
-            <span class="stat-label">Power Control</span>
-            <strong>Remote Restart Armed</strong>
-          </div>
+        <span class="topbar-meta">{{ model_name | default("Raspberry Pi 4 Model B") }}</span>
+        <div class="topbar-actions">
+          <span id="camera-health" class="pill">Probing</span>
+          <button type="button" id="refresh-camera" class="ghost-button">Refresh Feed</button>
+          <button type="button" id="refresh-pins" class="ghost-button">Refresh Pins</button>
+          <button type="button" id="restart-pi" class="restart-button">Restart Pi</button>
         </div>
+        <div id="status-toast" class="status-toast" aria-live="polite"></div>
       </header>
 
-      <main class="dashboard-grid">
-        <section class="camera-panel section-card">
-          <div class="section-heading">
-            <p class="section-index">01</p>
-            <div>
-              <h2>Camera Feed</h2>
-              <p>Raspberry Pi Camera Module 3 Wide</p>
+      <div class="workspace">
+
+        <nav class="pi-board-col" aria-label="Raspberry Pi board">
+          <div class="pi-board">
+            <div class="board-pcb">
+              <div class="board-label">Raspberry Pi 4B</div>
+              <div class="port port-ethernet">ETH</div>
+              <div class="port port-usb1">USB</div>
+              <div class="port port-usb2">USB</div>
+              <div class="port port-usbc">PWR</div>
+              <div class="port port-hdmi1">HDMI</div>
+              <div class="port port-hdmi2">HDMI</div>
+              <div class="port port-camera">CAM</div>
+              <div class="board-chip"></div>
+              <div class="header-grid" id="header-grid"></div>
             </div>
           </div>
+          <div class="board-footer">
+            <p class="board-hint">Click a pin to inspect and control it</p>
+          </div>
+        </nav>
+
+        <section class="camera-col" aria-label="Camera feed">
           <div class="camera-stage" id="camera-panel">
             <img
               id="camera-stream"
@@ -65,71 +69,81 @@
             </div>
           </div>
           <div class="camera-footer">
-            <span id="camera-health" class="pill">Probing camera</span>
-            <div class="camera-actions">
-              <button type="button" id="toggle-camera" class="ghost-button">
-                Disable Camera
-              </button>
-              <button type="button" id="refresh-camera" class="ghost-button">
-                Refresh Feed
-              </button>
-            </div>
+            <span id="camera-status-label" class="pill">Checking</span>
           </div>
         </section>
 
-        <aside class="system-panel section-card">
-          <div class="section-heading">
-            <p class="section-index">02</p>
-            <div>
-              <h2>System Actions</h2>
-              <p>Use sparingly. Restart interrupts the current session.</p>
+        <aside class="detail-panel" aria-label="Pin detail and controls">
+          <div class="detail-placeholder" id="detail-placeholder">
+            <p class="detail-placeholder-text">Select a pin on the board to view its details and controls.</p>
+          </div>
+
+          <div class="pin-detail" id="pin-detail" hidden>
+            <h3 class="pin-detail-name" id="detail-name"></h3>
+            <div class="pin-detail-nums">
+              <div class="pin-detail-num">
+                <span>BCM</span>
+                <strong id="detail-bcm"></strong>
+              </div>
+              <div class="pin-detail-num">
+                <span>Physical</span>
+                <strong id="detail-phys"></strong>
+              </div>
+            </div>
+            <span class="pin-detail-badge" id="detail-badge"></span>
+            <p class="pin-detail-note" id="detail-note"></p>
+            <p class="pin-detail-state" id="detail-state"></p>
+            <button type="button" class="pin-toggle" id="detail-toggle"></button>
+
+            <div class="pwm-controls" id="pwm-controls" hidden>
+              <p class="pwm-title">PWM Control</p>
+              <label class="pwm-label">
+                <span>Duty Cycle</span>
+                <div class="pwm-slider-row">
+                  <input type="range" id="pwm-duty" class="pwm-slider" min="0" max="100" value="50" step="1" />
+                  <span id="pwm-duty-val" class="pwm-val">50%</span>
+                </div>
+              </label>
+              <label class="pwm-label">
+                <span>Frequency (Hz)</span>
+                <input type="number" id="pwm-freq" class="pwm-input" min="1" max="50000" value="1000" step="1" />
+              </label>
+              <button type="button" id="pwm-apply" class="pwm-apply-button">Apply PWM</button>
             </div>
           </div>
 
-          <div id="status-banner" class="status-banner" hidden></div>
-
-          <button type="button" id="restart-pi" class="restart-button">
-            Restart Raspberry Pi
-          </button>
-
-          <div class="legend">
-            <div class="legend-item">
-              <span class="legend-swatch online"></span>
-              <span>Output is active</span>
+          <div class="legend-section">
+            <p class="legend-title">Pin States</p>
+            <div class="legend">
+              <div class="legend-item">
+                <span class="legend-swatch online"></span>
+                <span>Active</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-swatch idle"></span>
+                <span>Idle</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-swatch reserved"></span>
+                <span>Reserved</span>
+              </div>
             </div>
-            <div class="legend-item">
-              <span class="legend-swatch idle"></span>
-              <span>Output is idle</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-swatch reserved"></span>
-              <span>Reserved or read-only</span>
+          </div>
+
+          <div class="legend-section">
+            <p class="legend-title">Pin Types</p>
+            <div class="legend">
+              <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-digital)"></span><span>Digital</span></div>
+              <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-i2c)"></span><span>I2C</span></div>
+              <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-uart)"></span><span>UART</span></div>
+              <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-spi)"></span><span>SPI</span></div>
+              <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-pwm)"></span><span>PWM</span></div>
+              <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-pcm)"></span><span>PCM</span></div>
+              <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-clock)"></span><span>Clock</span></div>
             </div>
           </div>
         </aside>
-
-        <section class="pins-panel section-card">
-          <div class="section-heading">
-            <p class="section-index">03</p>
-            <div>
-              <h2>Pin Map</h2>
-              <p>Direct access to the Pi 4B 40-pin header.</p>
-            </div>
-          </div>
-
-          <div class="panel-toolbar">
-            <p class="toolbar-copy">
-              Tap a card to energize an output pin. Reserved pins are displayed
-              but locked.
-            </p>
-            <button type="button" id="refresh-pins" class="ghost-button">
-              Refresh Pins
-            </button>
-          </div>
-
-          <div id="pins-grid" class="pins-grid" aria-live="polite"></div>
-        </section>
-      </main>
+      </div>
     </div>
 
     <script>

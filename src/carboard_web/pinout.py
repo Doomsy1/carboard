@@ -67,3 +67,5 @@ BCM_PINS = [
 ]
 
 PIN_LOOKUP = {pin.bcm_pin: pin for pin in BCM_PINS}
+
+PWM_PINS = {12, 13, 18, 19}
