@@ -11,6 +11,7 @@
   const cameraHealth = document.getElementById("camera-health");
   const cameraStatusLabel = document.getElementById("camera-status-label");
   const cameraModeLabel = document.getElementById("camera-mode-label");
+  const cameraStreamUrl = cameraStream ? (cameraStream.dataset.streamUrl || "/stream.mjpg") : "/stream.mjpg";
   const pinDetail = document.getElementById("pin-detail");
   const detailPlaceholder = document.getElementById("detail-placeholder");
   const detailName = document.getElementById("detail-name");
@@ -43,6 +44,12 @@
       pinDetail.hidden = !hasSelection;
       pinDetail.style.display = hasSelection ? "flex" : "none";
     }
+  }
+
+  function setPwmVisibility(isVisible) {
+    if (!pwmControls) return;
+    pwmControls.hidden = !isVisible;
+    pwmControls.style.display = isVisible ? "flex" : "none";
   }
 
   // Accent color map
@@ -197,13 +204,13 @@
 
     // PWM controls
     var isPwm = PWM_PINS.has(bcmPin);
-    if (pwmControls) {
-      pwmControls.hidden = !isPwm;
-      if (isPwm && pin.pwm) {
-        pwmDuty.value = pin.pwm.duty_cycle;
-        pwmDutyVal.textContent = pin.pwm.duty_cycle + "%";
-        pwmFreq.value = pin.pwm.frequency;
-      }
+    setPwmVisibility(isPwm);
+    if (isPwm && pin.pwm) {
+      pwmDuty.value = pin.pwm.duty_cycle;
+      pwmDutyVal.textContent = pin.pwm.duty_cycle + "%";
+      pwmFreq.value = pin.pwm.frequency;
+    } else if (isPwm) {
+      pwmDutyVal.textContent = pwmDuty.value + "%";
     }
 
     renderHeaderGrid();
@@ -322,7 +329,7 @@
         if (cameraModeLabel) cameraModeLabel.textContent = "Live feed armed";
         if (toggleCameraButton) toggleCameraButton.textContent = "Disable Camera";
         cameraOverlay.classList.add("hidden");
-        cameraStream.src = "/stream.mjpg?ts=" + Date.now();
+        cameraStream.src = cameraStreamUrl + "?ts=" + Date.now();
       } else {
         cameraHealth.textContent = "Camera offline";
         cameraStatusLabel.textContent = "Offline";
@@ -330,12 +337,14 @@
         if (toggleCameraButton) toggleCameraButton.textContent = "Enable Camera";
         cameraOverlay.classList.remove("hidden");
         cameraOverlay.innerHTML = "<p>Camera detected as unavailable.</p>";
+        cameraStream.removeAttribute("src");
       }
     } catch (error) {
       cameraStatusLabel.textContent = "Error";
       if (cameraModeLabel) cameraModeLabel.textContent = "Camera check failed";
       cameraOverlay.classList.remove("hidden");
       cameraOverlay.innerHTML = "<p>" + error.message + "</p>";
+      cameraStream.removeAttribute("src");
     }
   }
 
@@ -466,6 +475,7 @@
   // ── Init ──
   renderHeaderGrid();
   setDetailVisibility(false);
+  setPwmVisibility(false);
   refreshPins();
   refreshCamera();
 })();

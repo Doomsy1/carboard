@@ -62,9 +62,33 @@
                 <div class="board-chip"></div>
                 <div class="header-grid" id="header-grid"></div>
               </div>
-              <div class="board-notes">
-                <p class="board-hint">Click a pin to inspect and control it</p>
-                <p class="board-note-detail">Power and ground positions stay visible for orientation, while live GPIO states glow directly on the header.</p>
+              <div class="board-support-rail">
+                <div class="board-brief">
+                  <p class="board-hint">Click a pin to inspect and control it.</p>
+                  <p class="board-note-detail">Power and ground stay fixed for orientation, while active GPIO channels glow directly on the header.</p>
+                </div>
+                <div class="board-legend-rail" aria-label="Board legend">
+                  <div class="legend-inline-group">
+                    <p class="legend-title">States</p>
+                    <div class="legend-chip-row">
+                      <span class="legend-chip"><span class="legend-swatch online"></span><span>Active</span></span>
+                      <span class="legend-chip"><span class="legend-swatch idle"></span><span>Idle</span></span>
+                      <span class="legend-chip"><span class="legend-swatch reserved"></span><span>Reserved</span></span>
+                    </div>
+                  </div>
+                  <div class="legend-inline-group">
+                    <p class="legend-title">Signals</p>
+                    <div class="legend-chip-row">
+                      <span class="legend-chip"><span class="legend-swatch" style="background:var(--accent-digital)"></span><span>Digital</span></span>
+                      <span class="legend-chip"><span class="legend-swatch" style="background:var(--accent-i2c)"></span><span>I2C</span></span>
+                      <span class="legend-chip"><span class="legend-swatch" style="background:var(--accent-uart)"></span><span>UART</span></span>
+                      <span class="legend-chip"><span class="legend-swatch" style="background:var(--accent-spi)"></span><span>SPI</span></span>
+                      <span class="legend-chip"><span class="legend-swatch" style="background:var(--accent-pwm)"></span><span>PWM</span></span>
+                      <span class="legend-chip"><span class="legend-swatch" style="background:var(--accent-pcm)"></span><span>PCM</span></span>
+                      <span class="legend-chip"><span class="legend-swatch" style="background:var(--accent-clock)"></span><span>Clock</span></span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -83,7 +107,7 @@
               <img
                 id="camera-stream"
                 class="camera-stream"
-                src="/stream.mjpg"
+                data-stream-url="/stream.mjpg"
                 alt="Live view from Raspberry Pi Camera Module 3 Wide"
               />
               <div class="camera-overlay" id="camera-overlay">
@@ -140,37 +164,6 @@
                   <input type="number" id="pwm-freq" class="pwm-input" min="1" max="50000" value="1000" step="1" />
                 </label>
                 <button type="button" id="pwm-apply" class="pwm-apply-button">Apply PWM</button>
-              </div>
-            </div>
-
-            <div class="legend-section">
-              <p class="legend-title">Pin States</p>
-              <div class="legend">
-                <div class="legend-item">
-                  <span class="legend-swatch online"></span>
-                  <span>Active</span>
-                </div>
-                <div class="legend-item">
-                  <span class="legend-swatch idle"></span>
-                  <span>Idle</span>
-                </div>
-                <div class="legend-item">
-                  <span class="legend-swatch reserved"></span>
-                  <span>Reserved</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="legend-section">
-              <p class="legend-title">Pin Types</p>
-              <div class="legend">
-                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-digital)"></span><span>Digital</span></div>
-                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-i2c)"></span><span>I2C</span></div>
-                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-uart)"></span><span>UART</span></div>
-                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-spi)"></span><span>SPI</span></div>
-                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-pwm)"></span><span>PWM</span></div>
-                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-pcm)"></span><span>PCM</span></div>
-                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-clock)"></span><span>Clock</span></div>
               </div>
             </div>
           </aside>

@@ -124,6 +124,23 @@ class WebAppTests(unittest.TestCase):
         self.assertIn("GPIO", text)
         self.assertIn("Console", text)
 
+    def test_index_defers_camera_stream_until_status_probe(self):
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        text = response.get_data(as_text=True)
+        self.assertIn('id="camera-stream"', text)
+        self.assertIn('data-stream-url="/stream.mjpg"', text)
+        self.assertNotIn('src="/stream.mjpg"', text)
+
+    def test_index_includes_board_support_rail_for_guidance_and_legend(self):
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        text = response.get_data(as_text=True)
+        self.assertIn('class="board-support-rail"', text)
+        self.assertIn('class="board-legend-rail"', text)
+
     def test_pin_api_returns_pi_4b_header_metadata(self):
         response = self.client.get("/api/pins")
 
