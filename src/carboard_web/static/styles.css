@@ -30,6 +30,7 @@
 
 html, body {
   height: 100%;
+  overflow: hidden;
   margin: 0;
 }
 
@@ -52,7 +53,8 @@ button, input, textarea, select {
 /* ── Page shell ── */
 .page-shell {
   position: relative;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   display: grid;
   grid-template-rows: auto 1fr;
 }
@@ -157,6 +159,8 @@ button, input, textarea, select {
   gap: 18px;
   padding: 18px;
   align-items: start;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .section-frame {
@@ -229,6 +233,8 @@ button, input, textarea, select {
   display: grid;
   gap: 18px;
   min-width: 0;
+  min-height: 0;
+  grid-template-rows: minmax(0, 0.95fr) minmax(0, 1.05fr);
 }
 
 .camera-col,
@@ -521,6 +527,8 @@ button.pin-dot:focus-visible {
   flex-direction: column;
   padding: 18px;
   gap: 8px;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .camera-stage {
@@ -530,8 +538,8 @@ button.pin-dot:focus-visible {
     linear-gradient(135deg, rgba(255, 214, 77, 0.06), transparent 32%),
     #0a0a0a;
   overflow: hidden;
-  aspect-ratio: 16 / 10;
-  min-height: 280px;
+  min-height: 0;
+  height: 100%;
 }
 
 .camera-stream {
@@ -608,7 +616,7 @@ button.pin-dot:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: min(54vh, 760px);
+  min-height: 0;
 }
 
 .detail-panel::-webkit-scrollbar { width: 4px; }
@@ -869,6 +877,11 @@ button.pin-dot:focus-visible {
 @media (max-width: 900px) {
   .workspace {
     grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+
+  .operations-column {
+    grid-template-rows: auto auto;
   }
 
   .board-pcb {
@@ -891,6 +904,16 @@ button.pin-dot:focus-visible {
 }
 
 @media (max-width: 640px) {
+  html, body {
+    overflow: auto;
+  }
+
+  .page-shell {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
   .topbar-actions {
     width: 100%;
     flex-wrap: wrap;
@@ -900,6 +923,7 @@ button.pin-dot:focus-visible {
 
   .workspace {
     padding: 12px;
+    overflow: visible;
   }
 
   .detail-panel {
