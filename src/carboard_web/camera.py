@@ -35,6 +35,7 @@ class CameraStreamer:
         self._output = None
         self._started = False
         self._lock = threading.Lock()
+        self._enabled = True
 
     def is_available(self) -> bool:
         if Picamera2 is None:
@@ -44,9 +45,33 @@ class CameraStreamer:
         except Exception:
             return False
 
+    def is_enabled(self) -> bool:
+        return self._enabled
+
+    def set_enabled(self, enabled: bool):
+        enabled = bool(enabled)
+        with self._lock:
+            self._enabled = enabled
+            if not enabled:
+                self._stop_locked()
+
+    def _stop_locked(self):
+        if not self._started:
+            return
+        try:
+            self._camera.stop_recording()
+        except Exception:
+            pass
+        self._camera = None
+        self._encoder = None
+        self._output = None
+        self._started = False
+
     def _ensure_started(self):
         if self._started:
             return
+        if not self._enabled:
+            raise RuntimeError("Camera stream is disabled")
         if not self.is_available():
             raise RuntimeError("Camera Module 3 Wide is unavailable")
 
@@ -64,6 +89,8 @@ class CameraStreamer:
     def frames(self):
         self._ensure_started()
         while True:
+            if not self._enabled:
+                raise RuntimeError("Camera stream is disabled")
             with self._output.condition:
                 self._output.condition.wait()
                 frame = self._output.frame

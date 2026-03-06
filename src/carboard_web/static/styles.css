@@ -229,6 +229,11 @@ select {
   margin-top: 18px;
 }
 
+.camera-actions {
+  display: flex;
+  gap: 12px;
+}
+
 .pill,
 .ghost-button,
 .restart-button,
@@ -456,7 +461,8 @@ select {
   }
 
   .camera-footer,
-  .panel-toolbar {
+  .panel-toolbar,
+  .camera-actions {
     flex-direction: column;
     align-items: stretch;
   }

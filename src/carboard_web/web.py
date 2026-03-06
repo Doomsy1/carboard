@@ -72,12 +72,30 @@ def create_app(controller=None, camera_streamer=None, restarter=None):
             {
                 "camera": CAMERA_MODEL,
                 "available": bool(camera_streamer.is_available()),
+                "enabled": bool(camera_streamer.is_enabled()),
+            }
+        )
+
+    @app.post("/api/camera")
+    def set_camera():
+        body = request.get_json(silent=True) or {}
+        if "enabled" not in body:
+            return jsonify({"error": "Request body must include a boolean 'enabled' field"}), 400
+        camera_streamer = app.config["camera_streamer"]
+        camera_streamer.set_enabled(bool(body["enabled"]))
+        return jsonify(
+            {
+                "camera": CAMERA_MODEL,
+                "available": bool(camera_streamer.is_available()),
+                "enabled": bool(camera_streamer.is_enabled()),
             }
         )
 
     @app.get("/stream.mjpg")
     def stream():
         camera_streamer = app.config["camera_streamer"]
+        if not camera_streamer.is_enabled():
+            return jsonify({"error": "Camera stream is disabled"}), 503
         if not camera_streamer.is_available():
             return jsonify({"error": "Camera stream is unavailable"}), 503
         return Response(

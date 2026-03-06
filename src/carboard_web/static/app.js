@@ -3,6 +3,7 @@
   const pinsGrid = document.getElementById("pins-grid");
   const refreshPinsButton = document.getElementById("refresh-pins");
   const refreshCameraButton = document.getElementById("refresh-camera");
+  const toggleCameraButton = document.getElementById("toggle-camera");
   const restartButton = document.getElementById("restart-pi");
   const statusBanner = document.getElementById("status-banner");
   const cameraStream = document.getElementById("camera-stream");
@@ -11,6 +12,7 @@
   const cameraStatusLabel = document.getElementById("camera-status-label");
 
   let pins = Array.isArray(bootstrap.pins) ? bootstrap.pins : [];
+  let cameraEnabled = true;
 
   function showStatus(message, level) {
     if (!statusBanner) return;
@@ -126,19 +128,53 @@
     try {
       const payload = await fetchJson("/api/camera");
       const available = Boolean(payload.available);
-      cameraHealth.textContent = available ? "Camera online" : "Camera offline";
-      cameraStatusLabel.textContent = available ? "Online" : "Offline";
-      if (available) {
+      cameraEnabled = payload.enabled !== false;
+      if (!cameraEnabled) {
+        cameraHealth.textContent = "Camera disabled";
+        cameraStatusLabel.textContent = "Disabled";
+        cameraOverlay.classList.remove("hidden");
+        cameraOverlay.innerHTML = "<p>Camera feed is manually disabled.</p>";
+        cameraStream.removeAttribute("src");
+      } else if (available) {
+        cameraHealth.textContent = "Camera online";
+        cameraStatusLabel.textContent = "Online";
         cameraOverlay.classList.add("hidden");
         cameraStream.src = `/stream.mjpg?ts=${Date.now()}`;
       } else {
+        cameraHealth.textContent = "Camera offline";
+        cameraStatusLabel.textContent = "Offline";
         cameraOverlay.classList.remove("hidden");
         cameraOverlay.innerHTML = "<p>Camera detected as unavailable.</p>";
+      }
+      if (toggleCameraButton) {
+        toggleCameraButton.textContent = cameraEnabled ? "Disable Camera" : "Enable Camera";
       }
     } catch (error) {
       cameraStatusLabel.textContent = "Error";
       cameraOverlay.classList.remove("hidden");
       cameraOverlay.innerHTML = `<p>${error.message}</p>`;
+    }
+  }
+
+  async function toggleCamera() {
+    if (!toggleCameraButton) return;
+    toggleCameraButton.disabled = true;
+    try {
+      const payload = await fetchJson("/api/camera", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: !cameraEnabled }),
+      });
+      cameraEnabled = payload.enabled !== false;
+      showStatus(
+        cameraEnabled ? "Camera feed enabled." : "Camera feed disabled.",
+        "success"
+      );
+      await refreshCamera();
+    } catch (error) {
+      showStatus(error.message, "error");
+    } finally {
+      toggleCameraButton.disabled = false;
     }
   }
 
@@ -167,6 +203,10 @@
 
   if (refreshCameraButton) {
     refreshCameraButton.addEventListener("click", refreshCamera);
+  }
+
+  if (toggleCameraButton) {
+    toggleCameraButton.addEventListener("click", toggleCamera);
   }
 
   if (restartButton) {

@@ -19,11 +19,20 @@ class FakeGPIOController:
 class FakeCameraStreamer:
     def __init__(self, available=True):
         self.available = available
+        self.enabled = True
 
     def is_available(self):
         return self.available
 
+    def is_enabled(self):
+        return self.enabled
+
+    def set_enabled(self, enabled):
+        self.enabled = bool(enabled)
+
     def frames(self):
+        if not self.enabled:
+            raise RuntimeError("Camera stream is disabled")
         yield b"--frame\r\nContent-Type: image/jpeg\r\n\r\nfakejpeg\r\n"
 
 
@@ -88,6 +97,7 @@ class WebAppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         payload = response.get_json()
         self.assertTrue(payload["available"])
+        self.assertTrue(payload["enabled"])
         self.assertEqual(payload["camera"], "Raspberry Pi Camera Module 3 Wide")
 
     def test_stream_endpoint_serves_mjpeg(self):
@@ -98,6 +108,17 @@ class WebAppTests(unittest.TestCase):
             response.headers["Content-Type"],
             "multipart/x-mixed-replace; boundary=frame",
         )
+
+    def test_camera_can_be_disabled(self):
+        response = self.client.post("/api/camera", json={"enabled": False})
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+        self.assertFalse(payload["enabled"])
+        self.assertFalse(self.camera.is_enabled())
+
+        stream_response = self.client.get("/stream.mjpg")
+        self.assertEqual(stream_response.status_code, 503)
 
     def test_restart_endpoint_calls_system_restart(self):
         response = self.client.post("/api/system/restart")
