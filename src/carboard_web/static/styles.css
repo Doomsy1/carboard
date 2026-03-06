@@ -155,10 +155,10 @@ button, input, textarea, select {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(640px, 1.4fr) minmax(360px, 0.86fr);
+  grid-template-columns: minmax(620px, 1.45fr) minmax(380px, 0.9fr);
   gap: 18px;
   padding: 18px;
-  align-items: start;
+  align-items: stretch;
   min-height: 0;
   overflow: hidden;
 }
@@ -234,7 +234,7 @@ button, input, textarea, select {
   gap: 18px;
   min-width: 0;
   min-height: 0;
-  grid-template-rows: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  grid-template-rows: minmax(220px, 0.72fr) minmax(0, 1.28fr);
 }
 
 .camera-col,
@@ -525,8 +525,8 @@ button.pin-dot:focus-visible {
 .camera-col {
   display: flex;
   flex-direction: column;
-  padding: 18px;
-  gap: 8px;
+  padding: 16px;
+  gap: 10px;
   min-height: 0;
   overflow: hidden;
 }
@@ -540,6 +540,7 @@ button.pin-dot:focus-visible {
   overflow: hidden;
   min-height: 0;
   height: 100%;
+  max-height: 330px;
 }
 
 .camera-stream {
@@ -611,11 +612,11 @@ button.pin-dot:focus-visible {
 
 /* ── Detail Panel ── */
 .detail-panel {
-  padding: 18px 18px 16px;
+  padding: 16px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   min-height: 0;
 }
 
@@ -624,7 +625,7 @@ button.pin-dot:focus-visible {
 .detail-panel::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
 
 .detail-placeholder {
-  flex: 1;
+  min-height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -937,5 +938,6 @@ button.pin-dot:focus-visible {
 
   .camera-stage {
     min-height: 220px;
+    max-height: none;
   }
 }

@@ -34,6 +34,17 @@
   let cameraEnabled = true;
   let toastTimer = null;
 
+  function setDetailVisibility(hasSelection) {
+    if (detailPlaceholder) {
+      detailPlaceholder.hidden = hasSelection;
+      detailPlaceholder.style.display = hasSelection ? "none" : "flex";
+    }
+    if (pinDetail) {
+      pinDetail.hidden = !hasSelection;
+      pinDetail.style.display = hasSelection ? "flex" : "none";
+    }
+  }
+
   // Accent color map
   const ACCENT_COLORS = {
     digital: "var(--accent-digital)",
@@ -170,9 +181,7 @@
     if (!pin) return;
 
     selectedBcm = bcmPin;
-
-    if (detailPlaceholder) detailPlaceholder.hidden = true;
-    if (pinDetail) pinDetail.hidden = false;
+    setDetailVisibility(true);
 
     var accentColor = ACCENT_COLORS[pin.accent] || ACCENT_COLORS.digital;
     detailName.textContent = pin.label || "GPIO" + pin.bcm_pin;
@@ -456,6 +465,7 @@
 
   // ── Init ──
   renderHeaderGrid();
+  setDetailVisibility(false);
   refreshPins();
   refreshCamera();
 })();
