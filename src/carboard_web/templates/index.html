@@ -36,24 +36,49 @@
       </header>
 
       <div class="workspace">
-        <div class="pi-board-row" aria-label="Raspberry Pi board">
-          <div class="board-pcb">
-            <div class="board-label">Raspberry Pi 4B</div>
-            <div class="port port-ethernet">ETH</div>
-            <div class="port port-usb1">USB</div>
-            <div class="port port-usb2">USB</div>
-            <div class="port port-usbc">PWR</div>
-            <div class="port port-hdmi1">HDMI</div>
-            <div class="port port-hdmi2">HDMI</div>
-            <div class="port port-camera">CAM</div>
-            <div class="board-chip"></div>
-            <div class="header-grid" id="header-grid"></div>
+        <section class="board-section">
+          <div class="section-frame">
+            <div class="section-kicker">Pin Matrix</div>
+            <div class="section-heading-row">
+              <div>
+                <h2 class="section-title">Board View</h2>
+                <p class="section-copy">Pick a physical header pin, then tune the selected channel from the control rail.</p>
+              </div>
+              <div class="board-summary">
+                <span class="board-summary-item">40-pin header</span>
+                <span class="board-summary-item">Pi 4B layout</span>
+              </div>
+            </div>
+            <div class="pi-board-row" aria-label="Raspberry Pi board">
+              <div class="board-pcb">
+                <div class="board-label">Raspberry Pi 4B</div>
+                <div class="port port-ethernet">ETH</div>
+                <div class="port port-usb1">USB</div>
+                <div class="port port-usb2">USB</div>
+                <div class="port port-usbc">PWR</div>
+                <div class="port port-hdmi1">HDMI</div>
+                <div class="port port-hdmi2">HDMI</div>
+                <div class="port port-camera">CAM</div>
+                <div class="board-chip"></div>
+                <div class="header-grid" id="header-grid"></div>
+              </div>
+              <div class="board-notes">
+                <p class="board-hint">Click a pin to inspect and control it</p>
+                <p class="board-note-detail">Power and ground positions stay visible for orientation, while live GPIO states glow directly on the header.</p>
+              </div>
+            </div>
           </div>
-          <p class="board-hint">Click a pin to inspect and control it</p>
-        </div>
+        </section>
 
-        <div class="bottom-section">
-          <section class="camera-col" aria-label="Camera feed">
+        <div class="operations-column">
+          <section class="camera-col section-frame" aria-label="Camera feed">
+            <div class="section-kicker">Vision Link</div>
+            <div class="section-heading-row compact">
+              <div>
+                <h2 class="section-title">Camera Feed</h2>
+                <p class="section-copy">Live framing from the Raspberry Pi Camera Module 3 Wide.</p>
+              </div>
+            </div>
             <div class="camera-stage" id="camera-panel">
               <img
                 id="camera-stream"
@@ -72,7 +97,14 @@
             </div>
           </section>
 
-          <aside class="detail-panel" aria-label="Pin detail and controls">
+          <aside class="detail-panel section-frame" aria-label="Pin detail and controls">
+            <div class="section-kicker">Control Rail</div>
+            <div class="section-heading-row compact detail-heading">
+              <div>
+                <h2 class="section-title">Selected Pin</h2>
+                <p class="section-copy">Direct controls, live state, and PWM when the hardware supports it.</p>
+              </div>
+            </div>
             <div class="detail-placeholder" id="detail-placeholder">
               <p class="detail-placeholder-text">Select a pin on the board to view its details and controls.</p>
             </div>
