@@ -26,6 +26,9 @@
   const pwmFreq = document.getElementById("pwm-freq");
   const pwmApply = document.getElementById("pwm-apply");
 
+  const fullscreenButton = document.getElementById("fullscreen-camera");
+  const cameraPanel = document.getElementById("camera-panel");
+
   let pins = Array.isArray(bootstrap.pins) ? bootstrap.pins : [];
   let selectedBcm = null;
   let cameraEnabled = true;
@@ -421,6 +424,17 @@
       var dutyCycle = parseFloat(pwmDuty.value);
       if (isNaN(frequency) || isNaN(dutyCycle)) return;
       applyPwm(selectedBcm, frequency, dutyCycle);
+    });
+  }
+
+  // Fullscreen camera
+  if (fullscreenButton && cameraPanel) {
+    fullscreenButton.addEventListener("click", function () {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        cameraPanel.requestFullscreen().catch(function () {});
+      }
     });
   }
 

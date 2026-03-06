@@ -481,6 +481,35 @@ button.pin-dot:focus-visible {
   display: none;
 }
 
+.fullscreen-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 150ms ease, background 150ms ease;
+  z-index: 5;
+}
+
+.camera-stage:hover .fullscreen-button {
+  opacity: 1;
+}
+
+.fullscreen-button:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
 .camera-footer {
   flex-shrink: 0;
   display: flex;
@@ -500,10 +529,10 @@ button.pin-dot:focus-visible {
 .detail-panel {
   border-left: 1px solid var(--line);
   overflow-y: auto;
-  padding: 16px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
   min-height: 0;
 }
 
@@ -529,11 +558,11 @@ button.pin-dot:focus-visible {
 .pin-detail {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .pin-detail-name {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -555,7 +584,7 @@ button.pin-dot:focus-visible {
 .pin-detail-num strong {
   color: var(--text);
   display: block;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   letter-spacing: 0.04em;
 }
 
@@ -589,7 +618,7 @@ button.pin-dot:focus-visible {
 
 .pin-toggle {
   cursor: pointer;
-  padding: 10px 14px;
+  padding: 8px 12px;
   background: rgba(255, 214, 77, 0.12);
   color: var(--text);
   text-transform: uppercase;
@@ -619,8 +648,8 @@ button.pin-dot:focus-visible {
 .pwm-controls {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding-top: 10px;
+  gap: 6px;
+  padding-top: 8px;
   border-top: 1px solid var(--line);
 }
 
@@ -716,12 +745,12 @@ button.pin-dot:focus-visible {
 
 /* ── Legend ── */
 .legend-section {
-  padding-top: 12px;
+  padding-top: 8px;
   border-top: 1px solid var(--line);
 }
 
 .legend-title {
-  margin: 0 0 8px;
+  margin: 0 0 4px;
   font-size: 0.6rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -730,7 +759,7 @@ button.pin-dot:focus-visible {
 
 .legend {
   display: grid;
-  gap: 6px;
+  gap: 3px;
 }
 
 .legend-item {
