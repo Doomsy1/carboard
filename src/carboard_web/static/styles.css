@@ -181,11 +181,10 @@ button, input, textarea, select {
   letter-spacing: 0.13em;
   font-size: 0.68rem;
   border: 1px solid var(--line);
-  transition: transform 150ms ease, background 150ms ease;
+  transition: background 150ms ease, border-color 150ms ease;
 }
 
 .ghost-button:hover {
-  transform: translateY(-1px);
   background: rgba(255, 255, 255, 0.05);
 }
 
@@ -198,11 +197,11 @@ button, input, textarea, select {
   letter-spacing: 0.14em;
   font-size: 0.72rem;
   border: 1px solid rgba(255, 103, 71, 0.4);
-  transition: transform 150ms ease, background 150ms ease;
+  transition: background 150ms ease, border-color 150ms ease;
 }
 
 .restart-button:hover {
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #ff7557, #b5361f);
 }
 
 .restart-button:disabled,
@@ -370,11 +369,11 @@ button, input, textarea, select {
 
 button.pin-dot {
   cursor: pointer;
+  transition: box-shadow 150ms ease;
 }
 
 button.pin-dot:hover {
-  transform: scale(1.3);
-  z-index: 2;
+  box-shadow: 0 0 0 2px rgba(255, 214, 77, 0.35);
 }
 
 button.pin-dot:focus-visible {
@@ -486,7 +485,15 @@ button.pin-dot:focus-visible {
   flex-shrink: 0;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
+}
+
+.camera-mode-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 /* ── Detail Panel ── */
@@ -589,11 +596,11 @@ button.pin-dot:focus-visible {
   letter-spacing: 0.16em;
   font-size: 0.76rem;
   border: 1px solid var(--line);
-  transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
 .pin-toggle:hover {
-  transform: translateY(-1px);
+  background: rgba(255, 214, 77, 0.2);
 }
 
 .pin-toggle.is-on {
@@ -700,11 +707,10 @@ button.pin-dot:focus-visible {
   letter-spacing: 0.14em;
   font-size: 0.72rem;
   border: 1px solid rgba(116, 255, 214, 0.3);
-  transition: transform 150ms ease, background 150ms ease;
+  transition: background 150ms ease, border-color 150ms ease;
 }
 
 .pwm-apply-button:hover {
-  transform: translateY(-1px);
   background: rgba(116, 255, 214, 0.25);
 }
 
@@ -772,6 +778,20 @@ button.pin-dot:focus-visible {
 }
 
 @media (max-width: 640px) {
+  .topbar {
+    flex-wrap: wrap;
+    height: auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+
   .bottom-section {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr auto;

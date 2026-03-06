@@ -27,6 +27,7 @@
         <span class="topbar-meta">{{ model_name | default("Raspberry Pi 4 Model B") }}</span>
         <div class="topbar-actions">
           <span id="camera-health" class="pill">Probing</span>
+          <button type="button" id="toggle-camera" class="ghost-button">Disable Camera</button>
           <button type="button" id="refresh-camera" class="ghost-button">Refresh Feed</button>
           <button type="button" id="refresh-pins" class="ghost-button">Refresh Pins</button>
           <button type="button" id="restart-pi" class="restart-button">Restart Pi</button>
@@ -66,6 +67,7 @@
             </div>
             <div class="camera-footer">
               <span id="camera-status-label" class="pill">Checking</span>
+              <span id="camera-mode-label" class="camera-mode-label">Live feed armed</span>
             </div>
           </section>
 
