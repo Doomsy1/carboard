@@ -1,0 +1,467 @@
+:root {
+  --bg: #111111;
+  --panel: rgba(24, 24, 24, 0.88);
+  --panel-strong: rgba(35, 35, 35, 0.94);
+  --line: rgba(255, 255, 255, 0.12);
+  --text: #f4eee2;
+  --muted: #b8b0a3;
+  --signal: #ffd64d;
+  --signal-deep: #d39200;
+  --danger: #ff6747;
+  --danger-deep: #a22d18;
+  --ok: #8cff74;
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background:
+    radial-gradient(circle at top left, rgba(255, 214, 77, 0.16), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(166, 47, 19, 0.26), transparent 36%),
+    #111111;
+  color: var(--text);
+}
+
+body {
+  margin: 0;
+  font-family: "Oswald", sans-serif;
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.page-shell {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  padding: 32px;
+}
+
+.noise {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  opacity: 0.08;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 120px 120px;
+  mask-image: radial-gradient(circle at center, black, transparent 85%);
+}
+
+.hero,
+.dashboard-grid {
+  position: relative;
+  z-index: 1;
+}
+
+.hero {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  align-items: end;
+  margin-bottom: 28px;
+}
+
+.eyebrow,
+.section-index,
+.stat-label {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  color: var(--signal);
+  font-size: 0.72rem;
+}
+
+.hero h1,
+.section-heading h2 {
+  margin: 0;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 7vw, 6.8rem);
+  max-width: 8ch;
+}
+
+.hero-text,
+.section-heading p,
+.toolbar-copy,
+.legend-item span,
+.camera-overlay,
+.status-banner {
+  font-family: "Instrument Serif", serif;
+  letter-spacing: 0.01em;
+}
+
+.hero-text {
+  max-width: 34rem;
+  font-size: 1.2rem;
+  color: var(--muted);
+}
+
+.hero-text span {
+  color: var(--text);
+}
+
+.hero-stats {
+  display: grid;
+  gap: 14px;
+}
+
+.stat-card,
+.section-card {
+  position: relative;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 45%), var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.stat-card {
+  padding: 18px 20px;
+}
+
+.stat-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 1.35rem;
+}
+
+.stat-card.caution {
+  border-color: rgba(255, 103, 71, 0.4);
+}
+
+.dashboard-grid {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.7fr);
+  grid-template-areas:
+    "camera system"
+    "pins pins";
+}
+
+.camera-panel {
+  grid-area: camera;
+}
+
+.system-panel {
+  grid-area: system;
+}
+
+.pins-panel {
+  grid-area: pins;
+}
+
+.section-card {
+  padding: 22px;
+}
+
+.section-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--signal), transparent 64%);
+}
+
+.section-heading {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.section-heading p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.camera-stage {
+  position: relative;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(135deg, rgba(255, 214, 77, 0.12), transparent 32%),
+    #0a0a0a;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.camera-stream {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.camera-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  text-align: center;
+  font-size: 1.4rem;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.7));
+}
+
+.camera-overlay.hidden {
+  display: none;
+}
+
+.camera-footer,
+.panel-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.pill,
+.ghost-button,
+.restart-button,
+.pin-chip,
+.pin-toggle {
+  border: 1px solid var(--line);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  background: rgba(255, 255, 255, 0.04);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.ghost-button,
+.restart-button,
+.pin-toggle {
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    background 150ms ease,
+    border-color 150ms ease;
+}
+
+.ghost-button {
+  padding: 11px 16px;
+  background: transparent;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+}
+
+.ghost-button:hover,
+.pin-toggle:hover,
+.restart-button:hover {
+  transform: translateY(-1px);
+}
+
+.restart-button {
+  width: 100%;
+  padding: 18px 22px;
+  background: linear-gradient(135deg, var(--danger), var(--danger-deep));
+  color: #fff8f5;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 1rem;
+  margin-bottom: 18px;
+}
+
+.restart-button:disabled,
+.ghost-button:disabled,
+.pin-toggle:disabled {
+  cursor: wait;
+  opacity: 0.6;
+  transform: none;
+}
+
+.status-banner {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 1.05rem;
+}
+
+.status-banner.error {
+  border-color: rgba(255, 103, 71, 0.55);
+  background: rgba(162, 45, 24, 0.22);
+}
+
+.status-banner.success {
+  border-color: rgba(140, 255, 116, 0.45);
+  background: rgba(77, 130, 46, 0.18);
+}
+
+.legend {
+  display: grid;
+  gap: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+}
+
+.legend-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+.legend-swatch.online {
+  background: linear-gradient(135deg, var(--ok), #3f7b2f);
+}
+
+.legend-swatch.idle {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.legend-swatch.reserved {
+  background: linear-gradient(135deg, #6a655d, #2c2927);
+}
+
+.pins-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.pin-card {
+  position: relative;
+  padding: 18px;
+  min-height: 210px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.08));
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.pin-card::after {
+  content: "";
+  position: absolute;
+  inset: auto 18px 18px auto;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 214, 77, 0.18), transparent 72%);
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.pin-card.is-on::after {
+  opacity: 1;
+}
+
+.pin-card.is-reserved {
+  opacity: 0.76;
+}
+
+.pin-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+}
+
+.pin-meta h3,
+.pin-meta p,
+.pin-note,
+.pin-state {
+  margin: 0;
+}
+
+.pin-meta h3 {
+  font-size: 1.5rem;
+  letter-spacing: 0.03em;
+}
+
+.pin-meta p,
+.pin-note,
+.pin-state {
+  color: var(--muted);
+}
+
+.pin-chip {
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  font-size: 0.72rem;
+}
+
+.pin-chip.live {
+  border-color: rgba(140, 255, 116, 0.55);
+  color: var(--ok);
+}
+
+.pin-chip.locked {
+  color: #c2b9aa;
+}
+
+.pin-toggle {
+  padding: 12px 14px;
+  background: rgba(255, 214, 77, 0.12);
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.pin-card.is-on .pin-toggle {
+  background: linear-gradient(135deg, var(--signal), var(--signal-deep));
+  color: #18110a;
+  border-color: rgba(255, 214, 77, 0.8);
+}
+
+@media (max-width: 980px) {
+  .page-shell {
+    padding: 20px;
+  }
+
+  .hero,
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-grid {
+    grid-template-areas:
+      "camera"
+      "system"
+      "pins";
+  }
+}
+
+@media (max-width: 640px) {
+  .hero h1 {
+    font-size: 2.9rem;
+  }
+
+  .camera-footer,
+  .panel-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pins-grid {
+    grid-template-columns: 1fr;
+  }
+}

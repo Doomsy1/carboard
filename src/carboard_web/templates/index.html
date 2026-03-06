@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ page_title | default("CARBOARD GPIO Control Console") }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="page-shell">
+      <div class="noise"></div>
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Field Operations / Raspberry Pi</p>
+          <h1>GPIO Control Console</h1>
+          <p class="hero-text">
+            Live control for the
+            <span>{{ model_name | default("Raspberry Pi 4 Model B") }}</span>
+            with camera monitoring and one-touch system recovery.
+          </p>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-card">
+            <span class="stat-label">GPIO Header</span>
+            <strong>{{ header_pin_count | default(40) }} Pins</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Camera</span>
+            <strong id="camera-status-label">Checking</strong>
+          </div>
+          <div class="stat-card caution">
+            <span class="stat-label">Power Control</span>
+            <strong>Remote Restart Armed</strong>
+          </div>
+        </div>
+      </header>
+
+      <main class="dashboard-grid">
+        <section class="camera-panel section-card">
+          <div class="section-heading">
+            <p class="section-index">01</p>
+            <div>
+              <h2>Camera Feed</h2>
+              <p>Raspberry Pi Camera Module 3 Wide</p>
+            </div>
+          </div>
+          <div class="camera-stage" id="camera-panel">
+            <img
+              id="camera-stream"
+              class="camera-stream"
+              src="/stream.mjpg"
+              alt="Live view from Raspberry Pi Camera Module 3 Wide"
+            />
+            <div class="camera-overlay" id="camera-overlay">
+              <p>Waiting for camera stream</p>
+            </div>
+          </div>
+          <div class="camera-footer">
+            <span id="camera-health" class="pill">Probing camera</span>
+            <button type="button" id="refresh-camera" class="ghost-button">
+              Refresh Feed
+            </button>
+          </div>
+        </section>
+
+        <aside class="system-panel section-card">
+          <div class="section-heading">
+            <p class="section-index">02</p>
+            <div>
+              <h2>System Actions</h2>
+              <p>Use sparingly. Restart interrupts the current session.</p>
+            </div>
+          </div>
+
+          <div id="status-banner" class="status-banner" hidden></div>
+
+          <button type="button" id="restart-pi" class="restart-button">
+            Restart Raspberry Pi
+          </button>
+
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-swatch online"></span>
+              <span>Output is active</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch idle"></span>
+              <span>Output is idle</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch reserved"></span>
+              <span>Reserved or read-only</span>
+            </div>
+          </div>
+        </aside>
+
+        <section class="pins-panel section-card">
+          <div class="section-heading">
+            <p class="section-index">03</p>
+            <div>
+              <h2>Pin Map</h2>
+              <p>Direct access to the Pi 4B 40-pin header.</p>
+            </div>
+          </div>
+
+          <div class="panel-toolbar">
+            <p class="toolbar-copy">
+              Tap a card to energize an output pin. Reserved pins are displayed
+              but locked.
+            </p>
+            <button type="button" id="refresh-pins" class="ghost-button">
+              Refresh Pins
+            </button>
+          </div>
+
+          <div id="pins-grid" class="pins-grid" aria-live="polite"></div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      window.CARBOARD_BOOTSTRAP = {
+        model: {{ model_name | default("Raspberry Pi 4 Model B") | tojson }},
+        pins: {{ pins | default([]) | tojson }},
+      };
+    </script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>

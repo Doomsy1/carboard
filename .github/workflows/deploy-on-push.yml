@@ -28,3 +28,4 @@ jobs:
           git fetch origin "${GITHUB_REF_NAME}"
           git checkout "${GITHUB_REF_NAME}"
           git pull --ff-only origin "${GITHUB_REF_NAME}"
+          bash scripts/install_webapp.sh

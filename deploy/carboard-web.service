@@ -1,0 +1,16 @@
+[Unit]
+Description=CARBOARD GPIO Web Console
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=carboard
+WorkingDirectory=/home/carboard/carboard
+ExecStart=/usr/bin/python3 -m src.carboard_web
+Restart=always
+RestartSec=3
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
