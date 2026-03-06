@@ -104,32 +104,33 @@
     }, 3000);
   }
 
-  // ── Pin header grid ──
+  // ── Pin header grid (horizontal: 20 cols x 2 rows) ──
   function renderHeaderGrid() {
     if (!headerGrid) return;
     var html = "";
-    for (var row = 0; row < 20; row++) {
-      var leftPhys = row * 2 + 1;
-      var rightPhys = row * 2 + 2;
-      html += renderPinDot(leftPhys, false);
-      html += renderPinDot(rightPhys, true);
+    // Row 1: odd pins (1, 3, 5, ..., 39) -- top row
+    for (var col = 0; col < 20; col++) {
+      html += renderPinDot(col * 2 + 1);
+    }
+    // Row 2: even pins (2, 4, 6, ..., 40) -- bottom row
+    for (var col = 0; col < 20; col++) {
+      html += renderPinDot(col * 2 + 2);
     }
     headerGrid.innerHTML = html;
   }
 
-  function renderPinDot(physPin, isRight) {
+  function renderPinDot(physPin) {
     var spec = PHYSICAL_PIN_MAP[physPin];
     if (!spec) return "";
 
     var isStatic = !spec.bcm && spec.bcm !== 0;
     var label = spec.label || "";
-    var type = spec.type || "";
     var color = "";
     var classes = ["pin-dot"];
     var bcmPin = null;
 
     if (isStatic) {
-      color = ACCENT_COLORS[type] || ACCENT_COLORS.digital;
+      color = ACCENT_COLORS[spec.type] || ACCENT_COLORS.digital;
       label = spec.label;
     } else {
       bcmPin = spec.bcm;
@@ -146,18 +147,15 @@
       }
     }
 
-    var wrapClass = "pin-dot-wrap" + (isRight ? " right-col" : "");
     var tag = isStatic ? "div" : "button";
     var dataAttr = isStatic ? "" : ' data-bcm-pin="' + bcmPin + '"';
+    var title = "Pin " + physPin + ": " + label;
 
-    return '<div class="' + wrapClass + '">' +
-      "<" + tag + ' class="' + classes.join(" ") + '"' +
+    return "<" + tag + ' class="' + classes.join(" ") + '"' +
       ' style="background:' + color + ';color:' + color + '"' +
       dataAttr +
-      ' title="Pin ' + physPin + ": " + label + '"' +
-      "></" + tag + ">" +
-      '<span class="pin-tooltip">Pin ' + physPin + ": " + label + "</span>" +
-      "</div>";
+      ' title="' + title.replace(/"/g, "&quot;") + '"' +
+      "></" + tag + ">";
   }
 
   // ── Pin detail panel ──

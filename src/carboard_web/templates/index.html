@@ -35,114 +35,111 @@
       </header>
 
       <div class="workspace">
+        <div class="pi-board-row" aria-label="Raspberry Pi board">
+          <div class="board-pcb">
+            <div class="board-label">Raspberry Pi 4B</div>
+            <div class="port port-ethernet">ETH</div>
+            <div class="port port-usb1">USB</div>
+            <div class="port port-usb2">USB</div>
+            <div class="port port-usbc">PWR</div>
+            <div class="port port-hdmi1">HDMI</div>
+            <div class="port port-hdmi2">HDMI</div>
+            <div class="port port-camera">CAM</div>
+            <div class="board-chip"></div>
+            <div class="header-grid" id="header-grid"></div>
+          </div>
+          <p class="board-hint">Click a pin to inspect and control it</p>
+        </div>
 
-        <nav class="pi-board-col" aria-label="Raspberry Pi board">
-          <div class="pi-board">
-            <div class="board-pcb">
-              <div class="board-label">Raspberry Pi 4B</div>
-              <div class="port port-ethernet">ETH</div>
-              <div class="port port-usb1">USB</div>
-              <div class="port port-usb2">USB</div>
-              <div class="port port-usbc">PWR</div>
-              <div class="port port-hdmi1">HDMI</div>
-              <div class="port port-hdmi2">HDMI</div>
-              <div class="port port-camera">CAM</div>
-              <div class="board-chip"></div>
-              <div class="header-grid" id="header-grid"></div>
-            </div>
-          </div>
-          <div class="board-footer">
-            <p class="board-hint">Click a pin to inspect and control it</p>
-          </div>
-        </nav>
-
-        <section class="camera-col" aria-label="Camera feed">
-          <div class="camera-stage" id="camera-panel">
-            <img
-              id="camera-stream"
-              class="camera-stream"
-              src="/stream.mjpg"
-              alt="Live view from Raspberry Pi Camera Module 3 Wide"
-            />
-            <div class="camera-overlay" id="camera-overlay">
-              <p>Waiting for camera stream</p>
-            </div>
-          </div>
-          <div class="camera-footer">
-            <span id="camera-status-label" class="pill">Checking</span>
-          </div>
-        </section>
-
-        <aside class="detail-panel" aria-label="Pin detail and controls">
-          <div class="detail-placeholder" id="detail-placeholder">
-            <p class="detail-placeholder-text">Select a pin on the board to view its details and controls.</p>
-          </div>
-
-          <div class="pin-detail" id="pin-detail" hidden>
-            <h3 class="pin-detail-name" id="detail-name"></h3>
-            <div class="pin-detail-nums">
-              <div class="pin-detail-num">
-                <span>BCM</span>
-                <strong id="detail-bcm"></strong>
-              </div>
-              <div class="pin-detail-num">
-                <span>Physical</span>
-                <strong id="detail-phys"></strong>
+        <div class="bottom-section">
+          <section class="camera-col" aria-label="Camera feed">
+            <div class="camera-stage" id="camera-panel">
+              <img
+                id="camera-stream"
+                class="camera-stream"
+                src="/stream.mjpg"
+                alt="Live view from Raspberry Pi Camera Module 3 Wide"
+              />
+              <div class="camera-overlay" id="camera-overlay">
+                <p>Waiting for camera stream</p>
               </div>
             </div>
-            <span class="pin-detail-badge" id="detail-badge"></span>
-            <p class="pin-detail-note" id="detail-note"></p>
-            <p class="pin-detail-state" id="detail-state"></p>
-            <button type="button" class="pin-toggle" id="detail-toggle"></button>
+            <div class="camera-footer">
+              <span id="camera-status-label" class="pill">Checking</span>
+            </div>
+          </section>
 
-            <div class="pwm-controls" id="pwm-controls" hidden>
-              <p class="pwm-title">PWM Control</p>
-              <label class="pwm-label">
-                <span>Duty Cycle</span>
-                <div class="pwm-slider-row">
-                  <input type="range" id="pwm-duty" class="pwm-slider" min="0" max="100" value="50" step="1" />
-                  <span id="pwm-duty-val" class="pwm-val">50%</span>
+          <aside class="detail-panel" aria-label="Pin detail and controls">
+            <div class="detail-placeholder" id="detail-placeholder">
+              <p class="detail-placeholder-text">Select a pin on the board to view its details and controls.</p>
+            </div>
+
+            <div class="pin-detail" id="pin-detail" hidden>
+              <h3 class="pin-detail-name" id="detail-name"></h3>
+              <div class="pin-detail-nums">
+                <div class="pin-detail-num">
+                  <span>BCM</span>
+                  <strong id="detail-bcm"></strong>
                 </div>
-              </label>
-              <label class="pwm-label">
-                <span>Frequency (Hz)</span>
-                <input type="number" id="pwm-freq" class="pwm-input" min="1" max="50000" value="1000" step="1" />
-              </label>
-              <button type="button" id="pwm-apply" class="pwm-apply-button">Apply PWM</button>
-            </div>
-          </div>
+                <div class="pin-detail-num">
+                  <span>Physical</span>
+                  <strong id="detail-phys"></strong>
+                </div>
+              </div>
+              <span class="pin-detail-badge" id="detail-badge"></span>
+              <p class="pin-detail-note" id="detail-note"></p>
+              <p class="pin-detail-state" id="detail-state"></p>
+              <button type="button" class="pin-toggle" id="detail-toggle"></button>
 
-          <div class="legend-section">
-            <p class="legend-title">Pin States</p>
-            <div class="legend">
-              <div class="legend-item">
-                <span class="legend-swatch online"></span>
-                <span>Active</span>
-              </div>
-              <div class="legend-item">
-                <span class="legend-swatch idle"></span>
-                <span>Idle</span>
-              </div>
-              <div class="legend-item">
-                <span class="legend-swatch reserved"></span>
-                <span>Reserved</span>
+              <div class="pwm-controls" id="pwm-controls" hidden>
+                <p class="pwm-title">PWM Control</p>
+                <label class="pwm-label">
+                  <span>Duty Cycle</span>
+                  <div class="pwm-slider-row">
+                    <input type="range" id="pwm-duty" class="pwm-slider" min="0" max="100" value="50" step="1" />
+                    <span id="pwm-duty-val" class="pwm-val">50%</span>
+                  </div>
+                </label>
+                <label class="pwm-label">
+                  <span>Frequency (Hz)</span>
+                  <input type="number" id="pwm-freq" class="pwm-input" min="1" max="50000" value="1000" step="1" />
+                </label>
+                <button type="button" id="pwm-apply" class="pwm-apply-button">Apply PWM</button>
               </div>
             </div>
-          </div>
 
-          <div class="legend-section">
-            <p class="legend-title">Pin Types</p>
-            <div class="legend">
-              <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-digital)"></span><span>Digital</span></div>
-              <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-i2c)"></span><span>I2C</span></div>
-              <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-uart)"></span><span>UART</span></div>
-              <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-spi)"></span><span>SPI</span></div>
-              <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-pwm)"></span><span>PWM</span></div>
-              <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-pcm)"></span><span>PCM</span></div>
-              <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-clock)"></span><span>Clock</span></div>
+            <div class="legend-section">
+              <p class="legend-title">Pin States</p>
+              <div class="legend">
+                <div class="legend-item">
+                  <span class="legend-swatch online"></span>
+                  <span>Active</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-swatch idle"></span>
+                  <span>Idle</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-swatch reserved"></span>
+                  <span>Reserved</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </aside>
+
+            <div class="legend-section">
+              <p class="legend-title">Pin Types</p>
+              <div class="legend">
+                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-digital)"></span><span>Digital</span></div>
+                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-i2c)"></span><span>I2C</span></div>
+                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-uart)"></span><span>UART</span></div>
+                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-spi)"></span><span>SPI</span></div>
+                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-pwm)"></span><span>PWM</span></div>
+                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-pcm)"></span><span>PCM</span></div>
+                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent-clock)"></span><span>Clock</span></div>
+              </div>
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
 
