@@ -1,5 +1,7 @@
 import unittest
+from unittest.mock import patch
 
+from src.carboard_web import camera as camera_module
 from src.carboard_web.pinout import BCM_PINS
 from src.carboard_web.web import create_app
 
@@ -7,9 +9,13 @@ from src.carboard_web.web import create_app
 class FakeGPIOController:
     def __init__(self):
         self.states = {}
+        self.pwm_states = {}
 
     def snapshot(self):
         return dict(self.states)
+
+    def pwm_snapshot(self):
+        return dict(self.pwm_states)
 
     def write(self, bcm_pin, value):
         self.states[bcm_pin] = bool(value)
@@ -44,6 +50,49 @@ class FakeRestarter:
         self.called = True
 
 
+class FakePicamera2:
+    instances = []
+
+    def __init__(self):
+        self.configured = None
+        self.recording = False
+        self.stopped = False
+        self.closed = False
+        FakePicamera2.instances.append(self)
+
+    @staticmethod
+    def global_camera_info():
+        return [{"id": "wide"}]
+
+    def create_video_configuration(self, **kwargs):
+        return kwargs
+
+    def configure(self, config):
+        self.configured = config
+
+    def start_recording(self, encoder, output):
+        self.recording = True
+
+    def stop_recording(self):
+        self.recording = False
+
+    def stop(self):
+        self.stopped = True
+
+    def close(self):
+        self.closed = True
+
+
+class FakeEncoder:
+    def __init__(self, bitrate):
+        self.bitrate = bitrate
+
+
+class FakeFileOutput:
+    def __init__(self, output):
+        self.output = output
+
+
 class WebAppTests(unittest.TestCase):
     def setUp(self):
         self.controller = FakeGPIOController()
@@ -63,7 +112,8 @@ class WebAppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         text = response.get_data(as_text=True)
         self.assertIn("Raspberry Pi 4 Model B", text)
-        self.assertIn("GPIO Control Console", text)
+        self.assertIn("GPIO", text)
+        self.assertIn("Console", text)
 
     def test_pin_api_returns_pi_4b_header_metadata(self):
         response = self.client.get("/api/pins")
@@ -127,6 +177,33 @@ class WebAppTests(unittest.TestCase):
         payload = response.get_json()
         self.assertEqual(payload["status"], "restarting")
         self.assertTrue(self.restarter.called)
+
+
+class CameraStreamerLifecycleTests(unittest.TestCase):
+    def test_disabling_active_camera_releases_it_for_reenable(self):
+        FakePicamera2.instances = []
+        streamer = camera_module.CameraStreamer()
+
+        with (
+            patch.object(camera_module, "Picamera2", FakePicamera2),
+            patch.object(camera_module, "MJPEGEncoder", FakeEncoder),
+            patch.object(camera_module, "FileOutput", FakeFileOutput),
+        ):
+            streamer._ensure_started()
+            first_camera = FakePicamera2.instances[-1]
+
+            streamer.set_enabled(False)
+
+            self.assertFalse(streamer.is_enabled())
+            self.assertTrue(first_camera.stopped)
+            self.assertTrue(first_camera.closed)
+
+            streamer.set_enabled(True)
+            streamer._ensure_started()
+            second_camera = FakePicamera2.instances[-1]
+
+            self.assertTrue(streamer.is_enabled())
+            self.assertIsNot(first_camera, second_camera)
 
 
 if __name__ == "__main__":

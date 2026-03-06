@@ -26,6 +26,11 @@ class StreamingOutput(io.BufferedIOBase):
             self.condition.notify_all()
         return len(buf)
 
+    def close_stream(self):
+        with self.condition:
+            self.frame = None
+            self.condition.notify_all()
+
 
 class CameraStreamer:
     def __init__(self):
@@ -56,16 +61,30 @@ class CameraStreamer:
                 self._stop_locked()
 
     def _stop_locked(self):
-        if not self._started:
-            return
-        try:
-            self._camera.stop_recording()
-        except Exception:
-            pass
+        output = self._output
+        camera = self._camera
         self._camera = None
         self._encoder = None
         self._output = None
         self._started = False
+
+        if output is not None:
+            output.close_stream()
+
+        if camera is None:
+            return
+        try:
+            camera.stop_recording()
+        except Exception:
+            pass
+        try:
+            camera.stop()
+        except Exception:
+            pass
+        try:
+            camera.close()
+        except Exception:
+            pass
 
     def _ensure_started(self):
         if self._started:
@@ -94,6 +113,8 @@ class CameraStreamer:
             with self._output.condition:
                 self._output.condition.wait()
                 frame = self._output.frame
+            if frame is None or not self._enabled:
+                raise RuntimeError("Camera stream is disabled")
             yield (
                 b"--frame\r\n"
                 b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n"
