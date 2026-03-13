@@ -1,48 +1,47 @@
 (function () {
-  const bootstrap = window.CARBOARD_BOOTSTRAP || {};
-  const headerGrid = document.getElementById("header-grid");
-  const refreshPinsButton = document.getElementById("refresh-pins");
-  const refreshCameraButton = document.getElementById("refresh-camera");
-  const toggleCameraButton = document.getElementById("toggle-camera");
-  const restartButton = document.getElementById("restart-pi");
-  const statusToast = document.getElementById("status-toast");
-  const cameraStream = document.getElementById("camera-stream");
-  const cameraOverlay = document.getElementById("camera-overlay");
-  const cameraHealth = document.getElementById("camera-health");
-  const cameraStatusLabel = document.getElementById("camera-status-label");
-  const cameraModeLabel = document.getElementById("camera-mode-label");
-  const cameraStreamUrl = cameraStream ? (cameraStream.dataset.streamUrl || "/stream.mjpg") : "/stream.mjpg";
-  const pinDetail = document.getElementById("pin-detail");
-  const detailPlaceholder = document.getElementById("detail-placeholder");
-  const detailName = document.getElementById("detail-name");
-  const detailBcm = document.getElementById("detail-bcm");
-  const detailPhys = document.getElementById("detail-phys");
-  const detailBadge = document.getElementById("detail-badge");
-  const detailNote = document.getElementById("detail-note");
-  const detailState = document.getElementById("detail-state");
-  const detailToggle = document.getElementById("detail-toggle");
-  const pwmControls = document.getElementById("pwm-controls");
-  const pwmDuty = document.getElementById("pwm-duty");
-  const pwmDutyVal = document.getElementById("pwm-duty-val");
-  const pwmFreq = document.getElementById("pwm-freq");
-  const pwmApply = document.getElementById("pwm-apply");
+  var bootstrap = window.CARBOARD_BOOTSTRAP || {};
+  var headerGrid = document.getElementById("header-grid");
+  var refreshPinsButton = document.getElementById("refresh-pins");
+  var refreshCameraButton = document.getElementById("refresh-camera");
+  var toggleCameraButton = document.getElementById("toggle-camera");
+  var restartButton = document.getElementById("restart-pi");
+  var statusToast = document.getElementById("status-toast");
+  var cameraStream = document.getElementById("camera-stream");
+  var cameraOverlay = document.getElementById("camera-overlay");
+  var cameraHealth = document.getElementById("camera-health");
+  var cameraStatusLabel = document.getElementById("camera-status-label");
+  var cameraModeLabel = document.getElementById("camera-mode-label");
+  var cameraStreamUrl = cameraStream ? (cameraStream.dataset.streamUrl || "/stream.mjpg") : "/stream.mjpg";
+  var pinDetail = document.getElementById("pin-detail");
+  var detailPlaceholder = document.getElementById("detail-placeholder");
+  var detailName = document.getElementById("detail-name");
+  var detailBcm = document.getElementById("detail-bcm");
+  var detailPhys = document.getElementById("detail-phys");
+  var detailBadge = document.getElementById("detail-badge");
+  var detailNote = document.getElementById("detail-note");
+  var detailState = document.getElementById("detail-state");
+  var detailToggle = document.getElementById("detail-toggle");
+  var pwmControls = document.getElementById("pwm-controls");
+  var pwmDuty = document.getElementById("pwm-duty");
+  var pwmDutyVal = document.getElementById("pwm-duty-val");
+  var pwmFreq = document.getElementById("pwm-freq");
+  var pwmApply = document.getElementById("pwm-apply");
+  var fullscreenButton = document.getElementById("fullscreen-camera");
+  var cameraPanel = document.getElementById("camera-panel");
 
-  const fullscreenButton = document.getElementById("fullscreen-camera");
-  const cameraPanel = document.getElementById("camera-panel");
-
-  let pins = Array.isArray(bootstrap.pins) ? bootstrap.pins : [];
-  let selectedBcm = null;
-  let cameraEnabled = true;
-  let toastTimer = null;
+  var pins = Array.isArray(bootstrap.pins) ? bootstrap.pins : [];
+  var selectedBcm = null;
+  var cameraEnabled = true;
+  var toastTimer = null;
 
   function setDetailVisibility(hasSelection) {
     if (detailPlaceholder) {
       detailPlaceholder.hidden = hasSelection;
-      detailPlaceholder.style.display = hasSelection ? "none" : "flex";
+      detailPlaceholder.style.display = hasSelection ? "none" : "";
     }
     if (pinDetail) {
       pinDetail.hidden = !hasSelection;
-      pinDetail.style.display = hasSelection ? "flex" : "none";
+      pinDetail.style.display = hasSelection ? "" : "none";
     }
   }
 
@@ -52,8 +51,7 @@
     pwmControls.style.display = isVisible ? "flex" : "none";
   }
 
-  // Accent color map
-  const ACCENT_COLORS = {
+  var ACCENT_COLORS = {
     digital: "var(--accent-digital)",
     i2c: "var(--accent-i2c)",
     uart: "var(--accent-uart)",
@@ -66,8 +64,7 @@
     gnd: "var(--accent-gnd)",
   };
 
-  // Full 40-pin physical header map
-  const PHYSICAL_PIN_MAP = {
+  var PHYSICAL_PIN_MAP = {
     1:  { label: "3V3 Power",  type: "power" },
     2:  { label: "5V Power",   type: "power" },
     3:  { bcm: 2 },
@@ -110,17 +107,16 @@
     40: { bcm: 21 },
   };
 
-  const PWM_PINS = new Set([12, 13, 18, 19]);
+  var PWM_PINS = new Set([12, 13, 18, 19]);
 
   function findPin(bcmPin) {
     return pins.find(function (p) { return p.bcm_pin === bcmPin; });
   }
 
-  // ── Status toast ──
   function showStatus(message, level) {
     if (!statusToast) return;
     statusToast.textContent = message;
-    statusToast.className = "status-toast visible";
+    statusToast.className = "toast visible";
     if (level) statusToast.classList.add(level);
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(function () {
@@ -128,15 +124,12 @@
     }, 3000);
   }
 
-  // ── Pin header grid (horizontal: 20 cols x 2 rows) ──
   function renderHeaderGrid() {
     if (!headerGrid) return;
     var html = "";
-    // Row 1: odd pins (1, 3, 5, ..., 39) -- top row
     for (var col = 0; col < 20; col++) {
       html += renderPinDot(col * 2 + 1);
     }
-    // Row 2: even pins (2, 4, 6, ..., 40) -- bottom row
     for (var col = 0; col < 20; col++) {
       html += renderPinDot(col * 2 + 2);
     }
@@ -182,7 +175,6 @@
       "></" + tag + ">";
   }
 
-  // ── Pin detail panel ──
   function showPinDetail(bcmPin) {
     var pin = findPin(bcmPin);
     if (!pin) return;
@@ -202,7 +194,6 @@
 
     updateDetailState(pin);
 
-    // PWM controls
     var isPwm = PWM_PINS.has(bcmPin);
     setPwmVisibility(isPwm);
     if (isPwm && pin.pwm) {
@@ -220,27 +211,29 @@
     if (!pin) return;
     if (pin.pwm) {
       detailState.textContent = "PWM " + pin.pwm.duty_cycle + "% @ " + pin.pwm.frequency + " Hz";
-      detailState.className = "pin-detail-state is-on";
+      detailState.className = "is-on";
+      detailState.id = "detail-state";
     } else if (!pin.controllable) {
       detailState.textContent = "Reserved";
-      detailState.className = "pin-detail-state is-off";
+      detailState.className = "is-off";
+      detailState.id = "detail-state";
     } else {
       detailState.textContent = pin.state ? "Output High" : "Output Low";
-      detailState.className = "pin-detail-state " + (pin.state ? "is-on" : "is-off");
+      detailState.className = pin.state ? "is-on" : "is-off";
+      detailState.id = "detail-state";
     }
 
     if (pin.controllable) {
       detailToggle.disabled = false;
       detailToggle.textContent = pin.state ? "Switch Low" : "Switch High";
-      detailToggle.className = "pin-toggle" + (pin.state ? " is-on" : "");
+      detailToggle.className = pin.state ? "is-on" : "";
     } else {
       detailToggle.disabled = true;
       detailToggle.textContent = "Locked";
-      detailToggle.className = "pin-toggle";
+      detailToggle.className = "";
     }
   }
 
-  // ── API helpers ──
   async function fetchJson(url, options) {
     var response = await fetch(url, options);
     var payload = await response.json().catch(function () { return {}; });
@@ -277,10 +270,8 @@
         return pin;
       });
       renderHeaderGrid();
-      if (selectedBcm === bcmPin) {
-        showPinDetail(bcmPin);
-      }
-      showStatus("BCM " + bcmPin + " set " + (payload.state ? "HIGH" : "LOW") + ".", "success");
+      if (selectedBcm === bcmPin) showPinDetail(bcmPin);
+      showStatus("BCM " + bcmPin + " set " + (payload.state ? "HIGH" : "LOW"), "success");
     } catch (error) {
       showStatus(error.message, "error");
     }
@@ -300,9 +291,7 @@
         return pin;
       });
       renderHeaderGrid();
-      if (selectedBcm === bcmPin) {
-        showPinDetail(bcmPin);
-      }
+      if (selectedBcm === bcmPin) showPinDetail(bcmPin);
       showStatus("BCM " + bcmPin + " PWM: " + dutyCycle + "% @ " + frequency + " Hz", "success");
     } catch (error) {
       showStatus(error.message, "error");
@@ -358,10 +347,7 @@
         body: JSON.stringify({ enabled: !cameraEnabled }),
       });
       cameraEnabled = payload.enabled !== false;
-      showStatus(
-        cameraEnabled ? "Camera feed enabled." : "Camera feed disabled.",
-        "success"
-      );
+      showStatus(cameraEnabled ? "Camera feed enabled." : "Camera feed disabled.", "success");
       await refreshCamera();
     } catch (error) {
       showStatus(error.message, "error");
@@ -371,11 +357,7 @@
   }
 
   async function restartPi() {
-    var confirmed = window.confirm(
-      "Restart the Raspberry Pi now? This will interrupt the dashboard briefly."
-    );
-    if (!confirmed) return;
-
+    if (!window.confirm("Restart the Raspberry Pi now?")) return;
     restartButton.disabled = true;
     try {
       var payload = await fetchJson("/api/system/restart", { method: "POST" });
@@ -383,30 +365,15 @@
     } catch (error) {
       showStatus(error.message, "error");
     } finally {
-      window.setTimeout(function () {
-        restartButton.disabled = false;
-      }, 2500);
+      setTimeout(function () { restartButton.disabled = false; }, 2500);
     }
   }
 
-  // ── Event listeners ──
-  if (refreshPinsButton) {
-    refreshPinsButton.addEventListener("click", refreshPins);
-  }
+  if (refreshPinsButton) refreshPinsButton.addEventListener("click", refreshPins);
+  if (refreshCameraButton) refreshCameraButton.addEventListener("click", refreshCamera);
+  if (toggleCameraButton) toggleCameraButton.addEventListener("click", toggleCamera);
+  if (restartButton) restartButton.addEventListener("click", restartPi);
 
-  if (refreshCameraButton) {
-    refreshCameraButton.addEventListener("click", refreshCamera);
-  }
-
-  if (toggleCameraButton) {
-    toggleCameraButton.addEventListener("click", toggleCamera);
-  }
-
-  if (restartButton) {
-    restartButton.addEventListener("click", restartPi);
-  }
-
-  // Pin dot clicks on the header grid
   if (headerGrid) {
     headerGrid.addEventListener("click", function (event) {
       var dot = event.target.closest("button.pin-dot");
@@ -417,7 +384,6 @@
     });
   }
 
-  // Detail toggle button
   if (detailToggle) {
     detailToggle.addEventListener("click", function () {
       if (selectedBcm === null) return;
@@ -427,14 +393,12 @@
     });
   }
 
-  // PWM duty cycle slider
   if (pwmDuty) {
     pwmDuty.addEventListener("input", function () {
       pwmDutyVal.textContent = pwmDuty.value + "%";
     });
   }
 
-  // PWM apply button
   if (pwmApply) {
     pwmApply.addEventListener("click", function () {
       if (selectedBcm === null) return;
@@ -445,7 +409,6 @@
     });
   }
 
-  // Fullscreen camera
   if (fullscreenButton && cameraPanel) {
     fullscreenButton.addEventListener("click", function () {
       if (document.fullscreenElement) {
@@ -456,7 +419,6 @@
     });
   }
 
-  // Camera stream events
   if (cameraStream) {
     cameraStream.addEventListener("load", function () {
       cameraOverlay.classList.add("hidden");
@@ -472,7 +434,6 @@
     });
   }
 
-  // ── Init ──
   renderHeaderGrid();
   setDetailVisibility(false);
   setPwmVisibility(false);

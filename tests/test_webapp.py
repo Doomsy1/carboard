@@ -115,14 +115,13 @@ class WebAppTests(unittest.TestCase):
         app.config["TESTING"] = True
         self.client = app.test_client()
 
-    def test_index_mentions_pi_model_and_gpio_console(self):
+    def test_index_mentions_pi_model_and_carboard(self):
         response = self.client.get("/")
 
         self.assertEqual(response.status_code, 200)
         text = response.get_data(as_text=True)
         self.assertIn("Raspberry Pi 4 Model B", text)
-        self.assertIn("GPIO", text)
-        self.assertIn("Console", text)
+        self.assertIn("Carboard", text)
 
     def test_index_defers_camera_stream_until_status_probe(self):
         response = self.client.get("/")
@@ -133,13 +132,12 @@ class WebAppTests(unittest.TestCase):
         self.assertIn('data-stream-url="/stream.mjpg"', text)
         self.assertNotIn('src="/stream.mjpg"', text)
 
-    def test_index_includes_board_support_rail_for_guidance_and_legend(self):
+    def test_index_includes_legend(self):
         response = self.client.get("/")
 
         self.assertEqual(response.status_code, 200)
         text = response.get_data(as_text=True)
-        self.assertIn('class="board-support-rail"', text)
-        self.assertIn('class="board-legend-rail"', text)
+        self.assertIn('class="legend"', text)
 
     def test_pin_api_returns_pi_4b_header_metadata(self):
         response = self.client.get("/api/pins")

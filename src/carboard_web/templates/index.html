@@ -3,173 +3,99 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{{ page_title | default("CARBOARD GPIO Console") }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
-      rel="stylesheet"
-    />
+    <title>{{ page_title | default("Carboard") }}</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='styles.css') }}"
     />
   </head>
   <body>
-    <div class="page-shell">
-      <div class="noise"></div>
+    <header>
+      <strong>Carboard</strong>
+      <span class="meta">{{ model_name | default("Raspberry Pi 4 Model B") }}</span>
+      <div class="actions">
+        <span id="camera-health" class="badge">Probing</span>
+        <button type="button" id="toggle-camera">Disable Camera</button>
+        <button type="button" id="refresh-camera">Refresh Feed</button>
+        <button type="button" id="refresh-pins">Refresh Pins</button>
+        <button type="button" id="restart-pi" class="danger">Restart Pi</button>
+      </div>
+      <div id="status-toast" class="toast" aria-live="polite"></div>
+    </header>
 
-      <header class="topbar">
-        <div class="topbar-brand">
-          <strong>Carboard</strong>
-          <span>GPIO Console</span>
+    <main>
+      <section class="panel pins-panel">
+        <h2>Pins</h2>
+        <div class="header-grid" id="header-grid"></div>
+        <div class="legend">
+          <span><span class="dot" style="background:var(--ok)"></span> Active</span>
+          <span><span class="dot" style="background:var(--muted)"></span> Idle</span>
+          <span><span class="dot" style="background:var(--accent-power)"></span> Power</span>
+          <span><span class="dot" style="background:var(--accent-gnd)"></span> Ground</span>
+          <span><span class="dot" style="background:var(--accent-i2c)"></span> I2C</span>
+          <span><span class="dot" style="background:var(--accent-uart)"></span> UART</span>
+          <span><span class="dot" style="background:var(--accent-spi)"></span> SPI</span>
+          <span><span class="dot" style="background:var(--accent-pwm)"></span> PWM</span>
         </div>
-        <span class="topbar-meta">{{ model_name | default("Raspberry Pi 4 Model B") }}</span>
-        <div class="topbar-actions">
-          <span id="camera-health" class="pill">Probing</span>
-          <button type="button" id="toggle-camera" class="ghost-button">Disable Camera</button>
-          <button type="button" id="refresh-camera" class="ghost-button">Refresh Feed</button>
-          <button type="button" id="refresh-pins" class="ghost-button">Refresh Pins</button>
-          <button type="button" id="restart-pi" class="restart-button">Restart Pi</button>
-        </div>
-        <div id="status-toast" class="status-toast" aria-live="polite"></div>
-      </header>
+      </section>
 
-      <div class="workspace">
-        <section class="board-section">
-          <div class="section-frame">
-            <div class="section-kicker">Pin Matrix</div>
-            <div class="section-heading-row">
-              <div>
-                <h2 class="section-title">Board View</h2>
-                <p class="section-copy">Pick a physical header pin, then tune the selected channel from the control rail.</p>
-              </div>
-              <div class="board-summary">
-                <span class="board-summary-item">40-pin header</span>
-                <span class="board-summary-item">Pi 4B layout</span>
-              </div>
+      <div class="sidebar">
+        <section class="panel" aria-label="Camera feed">
+          <h2>Camera</h2>
+          <div class="camera-stage" id="camera-panel">
+            <img
+              id="camera-stream"
+              class="camera-stream"
+              data-stream-url="/stream.mjpg"
+              alt="Camera feed"
+            />
+            <div class="camera-overlay" id="camera-overlay">
+              <p>Waiting for camera stream</p>
             </div>
-            <div class="pi-board-row" aria-label="Raspberry Pi board">
-              <div class="board-pcb">
-                <div class="board-label">Raspberry Pi 4B</div>
-                <div class="port port-ethernet">ETH</div>
-                <div class="port port-usb1">USB</div>
-                <div class="port port-usb2">USB</div>
-                <div class="port port-usbc">PWR</div>
-                <div class="port port-hdmi1">HDMI</div>
-                <div class="port port-hdmi2">HDMI</div>
-                <div class="port port-camera">CAM</div>
-                <div class="board-chip"></div>
-                <div class="header-grid" id="header-grid"></div>
-              </div>
-              <div class="board-support-rail">
-                <div class="board-brief">
-                  <p class="board-hint">Click a pin to inspect and control it.</p>
-                  <p class="board-note-detail">Power and ground stay fixed for orientation, while active GPIO channels glow directly on the header.</p>
-                </div>
-                <div class="board-legend-rail" aria-label="Board legend">
-                  <div class="legend-inline-group">
-                    <p class="legend-title">States</p>
-                    <div class="legend-chip-row">
-                      <span class="legend-chip"><span class="legend-swatch online"></span><span>Active</span></span>
-                      <span class="legend-chip"><span class="legend-swatch idle"></span><span>Idle</span></span>
-                      <span class="legend-chip"><span class="legend-swatch reserved"></span><span>Reserved</span></span>
-                    </div>
-                  </div>
-                  <div class="legend-inline-group">
-                    <p class="legend-title">Signals</p>
-                    <div class="legend-chip-row">
-                      <span class="legend-chip"><span class="legend-swatch" style="background:var(--accent-digital)"></span><span>Digital</span></span>
-                      <span class="legend-chip"><span class="legend-swatch" style="background:var(--accent-i2c)"></span><span>I2C</span></span>
-                      <span class="legend-chip"><span class="legend-swatch" style="background:var(--accent-uart)"></span><span>UART</span></span>
-                      <span class="legend-chip"><span class="legend-swatch" style="background:var(--accent-spi)"></span><span>SPI</span></span>
-                      <span class="legend-chip"><span class="legend-swatch" style="background:var(--accent-pwm)"></span><span>PWM</span></span>
-                      <span class="legend-chip"><span class="legend-swatch" style="background:var(--accent-pcm)"></span><span>PCM</span></span>
-                      <span class="legend-chip"><span class="legend-swatch" style="background:var(--accent-clock)"></span><span>Clock</span></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <button type="button" id="fullscreen-camera" class="fullscreen-btn" title="Fullscreen">&#x26F6;</button>
+          </div>
+          <div class="camera-footer">
+            <span id="camera-status-label" class="badge">Checking</span>
+            <span id="camera-mode-label" class="meta">Live feed armed</span>
           </div>
         </section>
 
-        <div class="operations-column">
-          <section class="camera-col section-frame" aria-label="Camera feed">
-            <div class="section-kicker">Vision Link</div>
-            <div class="section-heading-row compact">
-              <div>
-                <h2 class="section-title">Camera Feed</h2>
-                <p class="section-copy">Live framing from the Raspberry Pi Camera Module 3 Wide.</p>
-              </div>
-            </div>
-            <div class="camera-stage" id="camera-panel">
-              <img
-                id="camera-stream"
-                class="camera-stream"
-                data-stream-url="/stream.mjpg"
-                alt="Live view from Raspberry Pi Camera Module 3 Wide"
-              />
-              <div class="camera-overlay" id="camera-overlay">
-                <p>Waiting for camera stream</p>
-              </div>
-              <button type="button" id="fullscreen-camera" class="fullscreen-button" title="Toggle fullscreen">&#x26F6;</button>
-            </div>
-            <div class="camera-footer">
-              <span id="camera-status-label" class="pill">Checking</span>
-              <span id="camera-mode-label" class="camera-mode-label">Live feed armed</span>
-            </div>
-          </section>
+        <section class="panel" aria-label="Pin controls">
+          <h2>Controls</h2>
+          <div id="detail-placeholder">
+            <p class="muted">Select a pin to view details.</p>
+          </div>
 
-          <aside class="detail-panel section-frame" aria-label="Pin detail and controls">
-            <div class="section-kicker">Control Rail</div>
-            <div class="section-heading-row compact detail-heading">
-              <div>
-                <h2 class="section-title">Selected Pin</h2>
-                <p class="section-copy">Direct controls, live state, and PWM when the hardware supports it.</p>
-              </div>
+          <div id="pin-detail" hidden>
+            <h3 id="detail-name"></h3>
+            <div class="pin-nums">
+              <span>BCM <strong id="detail-bcm"></strong></span>
+              <span>Physical <strong id="detail-phys"></strong></span>
             </div>
-            <div class="detail-placeholder" id="detail-placeholder">
-              <p class="detail-placeholder-text">Select a pin on the board to view its details and controls.</p>
-            </div>
+            <span class="badge" id="detail-badge"></span>
+            <p class="muted" id="detail-note"></p>
+            <p id="detail-state"></p>
+            <button type="button" id="detail-toggle"></button>
 
-            <div class="pin-detail" id="pin-detail" hidden>
-              <h3 class="pin-detail-name" id="detail-name"></h3>
-              <div class="pin-detail-nums">
-                <div class="pin-detail-num">
-                  <span>BCM</span>
-                  <strong id="detail-bcm"></strong>
+            <div id="pwm-controls" hidden>
+              <h4>PWM</h4>
+              <label>
+                Duty Cycle
+                <div class="slider-row">
+                  <input type="range" id="pwm-duty" min="0" max="100" value="50" step="1" />
+                  <span id="pwm-duty-val">50%</span>
                 </div>
-                <div class="pin-detail-num">
-                  <span>Physical</span>
-                  <strong id="detail-phys"></strong>
-                </div>
-              </div>
-              <span class="pin-detail-badge" id="detail-badge"></span>
-              <p class="pin-detail-note" id="detail-note"></p>
-              <p class="pin-detail-state" id="detail-state"></p>
-              <button type="button" class="pin-toggle" id="detail-toggle"></button>
-
-              <div class="pwm-controls" id="pwm-controls" hidden>
-                <p class="pwm-title">PWM Control</p>
-                <label class="pwm-label">
-                  <span>Duty Cycle</span>
-                  <div class="pwm-slider-row">
-                    <input type="range" id="pwm-duty" class="pwm-slider" min="0" max="100" value="50" step="1" />
-                    <span id="pwm-duty-val" class="pwm-val">50%</span>
-                  </div>
-                </label>
-                <label class="pwm-label">
-                  <span>Frequency (Hz)</span>
-                  <input type="number" id="pwm-freq" class="pwm-input" min="1" max="50000" value="1000" step="1" />
-                </label>
-                <button type="button" id="pwm-apply" class="pwm-apply-button">Apply PWM</button>
-              </div>
+              </label>
+              <label>
+                Frequency (Hz)
+                <input type="number" id="pwm-freq" min="1" max="50000" value="1000" step="1" />
+              </label>
+              <button type="button" id="pwm-apply">Apply PWM</button>
             </div>
-          </aside>
-        </div>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
 
     <script>
       window.CARBOARD_BOOTSTRAP = {
